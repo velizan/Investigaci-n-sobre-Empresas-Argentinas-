@@ -1,5 +1,6 @@
-edictos_cargador/
-edictos_errores/
+edictos_cargados/
+errores/
+edictos_objetos/
 __pycache__/
 .env
 venv/
