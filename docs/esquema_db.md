@@ -1,6 +1,7 @@
 # 🗄️ Esquema de Base de Datos y Modelo Relacional
 
-![Texto alternativo de la imagen](images/der_edictosImagen.JPG)
+<img width="997" height="345" alt="der_edictosImagen" src="https://github.com/user-attachments/assets/65d9444a-ebee-4d05-867f-e51289ae40fb" />
+
 
 ## 🧠 Decisiones de Diseño y Reglas de Negocio
 
