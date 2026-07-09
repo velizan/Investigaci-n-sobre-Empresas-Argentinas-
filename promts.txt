@@ -1,0 +1,241 @@
+prompt = """
+    Actúa como un experto en análisis de documentos legales argentinos. Tu objetivo
+    es extraer información del edicto proporcionado y devolver un JSON estrictamente
+    estructurado.
+    Analiza el edicto y devuelve JSON (sin markdown).
+
+    REGLAS DE CLASIFICACIÓN:
+    - id_genero: 1 para Hombre, 2 para Mujer, 3 para X.
+    - id_nueva_preexistente: 1 para Nueva (Constitución), 2 para Preexistente 
+    (Reformas/Asambleas).
+    - id_tipo_societaria: 1 para SA, 2 para SAS, 3 para SRL.
+    - id_objeto: Elige el que mejor encaje (1: Industrial, 2: Comercial, 
+    3: Servicios, 4: Inmobiliario, 5: Agropecuario).
+    - id_tipo_fiscalizacion: 1 si el edicto dice que la fiscalización queda a cargo
+      de los socios, 2 si menciona Sindicatura o Consejo de Vigilancia.
+    
+    Reglas:
+    - Administradores: separa cargo y condición. Si no dice condición, es 'titular'.
+    - IDs: usa los IDs numéricos de los catálogos provistos.
+    -Formato: Devuelve estrictamente JSON, sin texto explicativo adicional.
+    Reglas de Datos Faltantes:
+    - Si un dato no aparece en el texto (ej. faltan socios, etc), asigna el valor 
+    null (o null en JSON).
+    - NO inventes datos.
+    - Excepciones: -la sindicatura sino se aclara es por socios. 
+                   -el género se infiere por el nombre.
+                   -la edad se calcula por la fecha de nacimiento.
+                   -si menciona un cargo (ej, presidente, gerente, directos, etc) y 
+                   no se aclara que es suplente entonces es titular. 
+    - los cargos escribirlos con la primera letra mayúsculas, el resto minúsculas (ej: Presidente, Director,etc).
+    Lo mismo con la condicion (Titular, Suplente)
+    Ejemplo de edicto: 
+    AGROTÉCNICA LATINA S.A.
+
+Se comunica: 1) Socios: Miguel Fernando KOZUSZOK, argentino, casado, nacido el 1 de marzo d e1959, contador público, Documento Nacional de Identidad 12.946.105, CUIT: 20-12946105-6, domiciliado en Avenida de la Cruz 30, La Isla, Nordelta, Partido de tigre, provincia de Buenos Aires; y ii) Micaela KOZUSZOK, argentina, casada, nacida el 14 de abril de 1986, abogada, Documento Nacional de Identidad 32.318.545, CUIT: 27-32318545-5, domiciliada en Iberá 2312, 4° A, Capital federal, 2) Fecha constitución: 30/01/2019, por escritura pública. 3) Denominación: “AGROTÉCNICA LATINA S.A.”; 4) Domicilio: Sanchez de Bustamante 1138 6° B, C.A.B.A. 5) La sociedad tiene por objeto dedicarse por cuenta propia o de terceros o asociada a terceros a las siguientes actividades: explotación directa o indirecta, por sí o por terceros, de establecimientos de propiedad de la sociedad o de terceras personas, agrícolas, ganaderos, frutícolas, forestales, de granja, apícolas, tambos, cabañas y haras, invernada, mestización, venta, cruza de ganado y hacienda de cualquier clase, siembra y cosecha de granos, forrajes, legumbres, hortalizas y toda clase de vegetales, cultivos, plantaciones, forestaciones y reforestaciones de todo tipo y clase, en estancias; potreros, bosques, montes y la compraventa, permuta, locación, transporte, depósito, consignación y cualquier otra operación sobre estos bienes y productos y demás actividades relacionadas con la agricultura, ganadería e industrialización de los productos de dichas explotaciones. 6) Plazo de duración: 99 años contados desde la inscripción en la Inspección General de Justicia. 7) Capital Social: $ 100.000 representado por cien mil acciones ordinarias, nominativas no endosables, de Un Peso valor nominal cada una y con derecho a un voto por acción, suscriptas de la siguiente manera: Miguel Fernando KOZUSZOK, suscribe 95.000 acciones y Micaela KOZUSZOK, suscribe 5.000 acciones. 8) La administración de la sociedad estará a cargo un Directorio compuesto de 1 a 5 miembros titulares. La representación legal de la Sociedad corresponde al Presidente del Directorio o al Vicepresidente, en caso de ausencia o incapacidad del primero. 9) Directores: PRESIDENTE: Micaela KOZUSZOK.- DIRECTOR SUPLENTE: Miguel Fernando KOZUSZOK. Aceptan cargos y constituyen domicilio en Sanchez de Bustamante 1138 6° B, CABA 10) Cierre del ejercicio: 31 de diciembre de cada año. Autorizado según instrumento público Esc. No 66 de fecha 30/01/2019 Reg. No 553
+
+maria lucia quinteiro - T°: 128 F°: 871 C.P.A.C.F.
+
+#I5674975I#
+
+Estructura del JSON:
+
+ {
+  "sociedad": {
+    "cuit": null, 
+    "anio_bo": 2019,
+    "capital_social": 100000.0,
+    "fecha_constitucion": "2019-01-30",
+    "id_objeto": 5,
+    "id_nueva_preexistente": 1,
+    "id_tipo_societaria": 1,
+    "id_tipo_fiscalizacion": 1
+  },
+  "socios": [
+    {
+      "dni": "12.946.105",
+      "nombre_completo": "Miguel Fernando KOZUSZOK",
+      "edad": 66,
+      "id_genero": 1,
+      "porcentaje": 95.0,
+      "cantidad_votos": 95000
+    },
+    {
+      "dni": "32.318.545",
+      "nombre_completo": "Micaela KOZUSZOK",
+      "edad": 39,
+      "id_genero": 2,
+      "porcentaje": 5.0,
+      "cantidad_votos": 5000
+    }
+  ],
+  "administradores": [
+    {
+      "dni": "32.318.545",
+      "nombre_completo": "Micaela KOZUSZOK",
+      "id_genero": 2,
+      "cargo": "Presidente",
+      "condicion": "titular"
+    },
+    {
+      "dni": "12.946.105",
+      "nombre_completo": "Miguel Fernando KOZUSZOK",
+      "id_genero": 1,
+      "cargo": "Director",
+      "condicion": "suplente"
+    }
+  ],
+  "sindicatura": [
+  {
+      "dni": "12.946.105",
+      "nombre_completo": "Miguel Fernando KOZUSZOK",
+      "id_genero": 1
+    },
+    {
+      "dni": "32.318.545",
+      "nombre_completo": "Micaela KOZUSZOK",
+      "id_genero": 2
+    }
+  ]
+}
+
+
+
+-----
+"Actúa como un experto en extracción de datos legales y bases de datos PostgreSQL.
+
+Tarea: Transcribir el texto de un edicto comercial de Argentina a un formato JSON estricto.
+
+1. Esquema de Salida (JSON Obligatorio)
+Devuelve exclusivamente un objeto JSON con esta estructura. Si una lista no tiene datos, usa [].
+
+JSON
+abro llave
+
+  "denominacion": "NOMBRE DE LA SOCIEDAD",
+  "cuit": "xx-xxxxxxxx-x o null",
+  "anio_bo": 2024,
+  "capital_social": 100000.00,
+  "fecha_constitucion": "YYYY-MM-DD",
+  "id_objeto": "1: Industrial, 2: Comercial, 3: Servicios, 4: Inmobilirio, 5: Agropecuario",
+  "id_nueva_preexistente": "1: Nueva, 2: Preexistente",
+  "id_tipo_societaria": "1: SA, 2: SAS, 3: SRL",
+  "id_tipo_fiscalizacion": "1: Prescinde de sindicatura (socios), 2: Sindicatura, null: No aclara",
+  "socios": [],
+  "administradores": [],
+  "sindicatura": []
+
+cierro llave
+2. Especificación de Arrays
+socios: Cada objeto debe tener 
+abro llave
+dni (sin puntos), nombre_completo, edad (a la fecha del edicto), id_genero (1:H, 2:M, 3:X), porcentaje, cantidad_votos
+cierro llave
+
+administradores: Cada objeto debe tener 
+abro llave
+dni (sin puntos), nombre_completo, id_genero, cargo (Capitalize), condicion (Capitalize)
+cierro llave
+Por defecto, condición es "Titular".
+Si una persona tiene más de un cargo, priorizar el más importante. 
+El cargo debe ir solo, nunca acompañado de la condicion (titular o suplente).
+El cargo debe ir en masculino (Presidente, Gerente, Director, etc.)
+
+sindicatura: Cada objeto debe tener 
+abro llave
+dni (sin puntos), nombre_completo, id_genero, condicion_fiscal (Capitalize)
+cierro llave
+SOLO cuando se prescinde de sindicatura (id_tipo_fiscalizacion = 1) los socios se deben 
+agregar al array de sindicatura.
+Por defecto, condicion_fiscal es "Titular", salvo se aclare que es suplente. 
+
+3. Reglas Críticas de Formato
+Nombre de la sociedad: siempre en mayúsculas. (ej: BECCAR S.A.)
+DNI: Siempre como cadena numérica sin puntos (ej: "20817187").
+
+CUIT: Siempre con guiones (ej: "27-20817187-4").
+
+Edad: Calcular restando el año de nacimiento al año de la fecha del edicto.
+
+nombre_completo: escribir en Capitalize
+
+Capitalización: Cargos ("Presidente", "Gerente",etc) y condiciones ("Titular" o "Suplente) siempre con la primera letra en Mayúscula (ej: "Presidente", "Gerente", "Suplente").
+
+id_tipo_fiscalizacion: si se aclara que se prescinde de sindicatura entonces va "1" (socios)
+                       si se aclara que existe sindicatura, órgano de fiscalización o similar entonces va "2" (sindicatura).
+                       si no se aclara ninguna de las dos anteriores entonces va "null"
+
+Integridad: No inventar datos. Si falta, usar null.
+
+   Texto a procesar: {texto_edicto}
+    
+"""
+ULTIMO CORREGIDO ->>>>>>
+"""Actúa como un experto en extracción de datos legales y bases de datos PostgreSQL.
+
+Tarea: Transcribir el texto de un edicto comercial de Argentina a un formato JSON estricto.
+
+1. Esquema de Salida (JSON Obligatorio)
+Devuelve exclusivamente un objeto JSON con esta estructura. Si una lista no tiene datos, usa [].
+
+JSON
+abro llave
+
+  "denominacion": "NOMBRE DE LA SOCIEDAD",
+  "cuit": "xx-xxxxxxxx-x o null",
+  "anio_bo": 2024,
+  "capital_social": 100000.00,
+  "fecha_constitucion": "YYYY-MM-DD",
+  "id_objeto": "1: Industrial, 2: Comercial, 3: Servicios, 4: Inmobilirio, 5: Agropecuario",
+  "id_nueva_preexistente": "1: Nueva, 2: Preexistente",
+  "id_tipo_societaria": "1: SA, 2: SAS, 3: SRL",
+  "id_tipo_fiscalizacion": "1: Prescinde de sindicatura (socios), 2: Sindicatura, null: No aclara",
+  "socios": [],
+  "administradores": [],
+  "sindicatura": []
+
+cierro llave
+2. Especificación de Arrays
+socios: Cada objeto debe tener 
+abro llave
+dni (sin puntos), nombre_completo, edad (a la fecha del edicto), id_genero (1:H, 2:M, 3:X), porcentaje, cantidad_votos
+cierro llave
+
+administradores: Cada objeto debe tener 
+abro llave
+dni (sin puntos), nombre_completo, id_genero, cargo (Capitalize), condicion (Capitalize)
+cierro llave
+Por defecto, condición es "Titular".
+Si una persona tiene más de un cargo, priorizar el más importante. 
+El cargo debe ir solo, nunca acompañado de la condicion (titular o suplente).
+El cargo debe ir en masculino (Presidente, Gerente, Director, etc.)
+
+sindicatura: Cada objeto debe tener 
+abro llave
+dni (sin puntos), nombre_completo, id_genero, condicion_fiscal (Capitalize)
+cierro llave
+SOLO cuando se prescinde de sindicatura (id_tipo_fiscalizacion = 1) los socios se deben 
+agregar al array de sindicatura.
+Por defecto, condicion_fiscal es "Titular", salvo se aclare que es suplente. 
+
+3. Reglas Críticas de Formato
+Nombre de la sociedad: siempre en mayúsculas. (ej: BECCAR S.A.)
+DNI: Siempre como cadena numérica sin puntos (ej: "20817187").
+
+CUIT: Siempre con guiones (ej: "27-20817187-4").
+
+Edad: Calcular restando el año de nacimiento al año de la fecha del edicto.
+
+nombre_completo: escribir en Capitalize
+
+Capitalización: Cargos ("Presidente", "Gerente",etc) y condiciones ("Titular" o "Suplente) siempre con la primera letra en Mayúscula (ej: "Presidente", "Gerente", "Suplente").
+
+id_tipo_fiscalizacion: si se aclara que se prescinde de sindicatura entonces va "1" (socios)
+                       si se aclara que existe sindicatura, órgano de fiscalización o similar entonces va "2" (sindicatura).
+                       si no se aclara ninguna de las dos anteriores entonces va "null"
+
+Integridad: No inventar datos. Si falta, usar null.
+
+   Texto a procesar: {texto_edicto}
+    
+"""

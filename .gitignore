@@ -1,0 +1,4 @@
+edictos_cargador/
+edictos_errores/
+__pycache__/
+.env

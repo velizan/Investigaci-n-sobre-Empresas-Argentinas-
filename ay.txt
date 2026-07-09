@@ -1,0 +1,48 @@
+# --- 2. ORQUESTADOR EXCLUSIVO PARA OBJETOS ---
+def procesar_edicto_objetos(texto_edicto, nombre_archivo, tiempo_inicio=None): 
+    print(f"\n--- 🚀 Procesando Objetos: {nombre_archivo} ---")
+    
+    # Llamamos a la versión del handler específica para objetos
+    datos = extraer_json_gemini_objetos(texto_edicto)
+    
+    if not datos: 
+        mensaje = "Gemini no devolvió un JSON válido o la respuesta fue nula."
+        print(f"❌ Error IA: {mensaje}")
+        return False, "error_ia", mensaje 
+
+    # --- LA SOLUCIÓN ESTÁ AQUÍ ---
+    # Si 'datos' es una lista (múltiples edictos) o no es un diccionario, cancelamos antes de que rompa.
+    if not isinstance(datos, dict):
+        mensaje = "El documento contiene múltiples edictos o un formato no esperado."
+        print(f"❌ Cancelando carga: {mensaje}")
+        # Al devolver "formato_invalido", el orquestador lo mueve a esa carpeta y sigue con el próximo.
+        return False, "formato_invalido", mensaje
+
+    # A partir de aquí, es 100% seguro usar .get()
+    if not datos.get("id_objeto1"):
+        mensaje = "El edicto no especifica un objeto societario (id_objeto1 es nulo)."
+        print(f"⏭️ Omitiendo: {mensaje}")
+        return False, "sin_objetos", mensaje
+
+    try:
+        id_sociedad = gestionar_objetos(datos)
+        
+        if not id_sociedad:
+            raise Exception("La transacción falló o no se pudo obtener el ID de la sociedad.")
+            
+        print(f"✅ Objetos incorporados/actualizados. ID Sociedad: {id_sociedad}")
+        
+        # --- CÁLCULO DE TIEMPO ACUMULADO ---
+        if tiempo_inicio:
+            tiempo_actual = time.time() - tiempo_inicio
+            minutos, segundos = divmod(tiempo_actual, 60)
+            print(f"🏁 Finalizado exitosamente: {nombre_archivo} | ⏱️ Tiempo acumulado: {int(minutos)}m {int(segundos)}s")
+        else:
+            print(f"🏁 Finalizado exitosamente: {nombre_archivo}")
+            
+        return True, None, "" 
+
+    except Exception as e:
+        mensaje = str(e)
+        print(f"❌ Error BD procesando {nombre_archivo}: {mensaje}")
+        return False, "error_bd", mensaje
