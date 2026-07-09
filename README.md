@@ -1,5 +1,5 @@
-## ⚖️ Boletín Oficial Data Pipeline: De Texto Plano a Inteligencia de Negocios
-**🚀 El Impacto**
+# ⚖️ Boletín Oficial Data Pipeline: De Texto Plano a Inteligencia de Negocios
+## **🚀 El Impacto**
 La constitución de sociedades comerciales en Argentina genera un volumen masivo de datos no estructurados. Tradicionalmente, la lectura, interpretación manual y clasificación de los datos de un edicto (socios, capital, autoridades) demanda aproximadamente 20 minutos por documento.
 
 Este proyecto implementa una canalización automatizada mediante IA que reduce el tiempo de procesamiento a 50 segundos por edicto. Se logró estructurar y persistir un lote histórico completo de 8.200 edictos con un costo operativo de infraestructura (API) de aproximadamente $25 USD.
