@@ -1,6 +1,6 @@
 # 🗄️ Esquema de Base de Datos y Modelo Relacional
 
-<img src="/home/velizan/proyecto_bora/docs/der_edictosImagen.JPG" width="500" alt="Texto alternativo">
+![Texto alternativo de la imagen](images/der_edictosImagen.JPG)
 
 ## 🧠 Decisiones de Diseño y Reglas de Negocio
 
